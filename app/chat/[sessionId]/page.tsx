@@ -32,6 +32,14 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const getErrorMessage = (err: unknown, fallback: string) => {
+    if (!(err instanceof Error)) return fallback;
+    if (err.message.includes("429")) {
+      return "AI is rate-limited right now. Please wait a moment and retry.";
+    }
+    return err.message || fallback;
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -48,7 +56,7 @@ export default function ChatPage() {
       setMessages(history);
     } catch (err) {
       console.error("Failed to load chat:", err);
-      setError("Failed to load chat history. Redirecting…");
+      setError(getErrorMessage(err, "Failed to load chat history. Redirecting..."));
       setTimeout(() => {
         router.push("/partners");
       }, 2000);
@@ -77,7 +85,7 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
       console.error("Failed to send message:", err);
-      setError("Message failed. Try again.");
+      setError(getErrorMessage(err, "Message failed. Try again."));
       setMessages((prev) => prev.slice(0, -1));
     } finally {
       setSending(false);
@@ -257,3 +265,4 @@ export default function ChatPage() {
     </div>
   );
 }
+

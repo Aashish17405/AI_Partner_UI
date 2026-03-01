@@ -77,7 +77,21 @@ class APIClient {
       });
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        let detail = "";
+        try {
+          const data = (await response.json()) as { detail?: unknown };
+          if (typeof data?.detail === "string") {
+            detail = data.detail;
+          } else if (data?.detail != null) {
+            detail = JSON.stringify(data.detail);
+          }
+        } catch {
+          // ignore parse failures and fallback to status text
+        }
+        const message = detail
+          ? `API Error: ${response.status} ${detail}`
+          : `API Error: ${response.status} ${response.statusText}`;
+        throw new Error(message);
       }
 
       return response.json() as Promise<T>;

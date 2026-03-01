@@ -111,7 +111,12 @@ export default function OnboardPage() {
       router.push(`/chat/${session.id}`);
     } catch (error) {
       console.error("Failed to create session:", error);
-      setErrors({ submit: "Failed to start chat. Try again." });
+      const message =
+        error instanceof Error ? error.message : "Failed to start chat.";
+      const submitMessage = message.includes("429")
+        ? "AI is rate-limited right now. Please wait a moment and retry."
+        : message;
+      setErrors({ submit: submitMessage });
     } finally {
       setLoading(false);
     }
