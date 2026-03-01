@@ -101,9 +101,17 @@ class APIClient {
     userInterests: string[],
     userNickname?: string,
     personalityPreference?: string,
+    latitude?: number,
+    longitude?: number,
   ): Promise<Session> {
+    const extraHeaders: Record<string, string> = {};
+    if (latitude !== undefined) extraHeaders["X-Latitude"] = String(latitude);
+    if (longitude !== undefined)
+      extraHeaders["X-Longitude"] = String(longitude);
+
     const raw = await this.request<BackendSession>("/sessions", {
       method: "POST",
+      headers: extraHeaders,
       body: JSON.stringify({
         partner_id: partnerId,
         user_name: userName,

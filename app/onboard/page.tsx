@@ -21,6 +21,10 @@ export default function OnboardPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [step, setStep] = useState(1);
+  const [coords, setCoords] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -28,6 +32,20 @@ export default function OnboardPage() {
     if (pid) {
       setPartnerId(pid);
       fetchPartnerDetails(pid);
+    }
+    // Silently request geolocation so the agent can reference the user's location in chat
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) =>
+          setCoords({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          }),
+        () => {
+          /* permission denied or unavailable — carry on without coords */
+        },
+        { timeout: 8000, maximumAge: 600_000 },
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -86,6 +104,8 @@ export default function OnboardPage() {
         interests,
         formData.nickname || undefined,
         formData.personality,
+        coords?.latitude,
+        coords?.longitude,
       );
       saveSessionToLocalStorage(session.id);
       router.push(`/chat/${session.id}`);
