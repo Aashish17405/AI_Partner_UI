@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiClient, Message, Partner } from "@/lib/api";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
+import { PageLoader, TypingBubble } from "@/components/Loader";
 import { clearSessionFromLocalStorage } from "@/lib/utils";
 
 export default function ChatPage() {
@@ -56,7 +57,9 @@ export default function ChatPage() {
       setMessages(history);
     } catch (err) {
       console.error("Failed to load chat:", err);
-      setError(getErrorMessage(err, "Failed to load chat history. Redirecting..."));
+      setError(
+        getErrorMessage(err, "Failed to load chat history. Redirecting..."),
+      );
       setTimeout(() => {
         router.push("/partners");
       }, 2000);
@@ -111,20 +114,7 @@ export default function ChatPage() {
   };
 
   if (loading) {
-    return (
-      <div
-        className="h-screen flex items-center justify-center"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
-        <div
-          className="flex items-center gap-3"
-          style={{ color: "var(--text-muted)" }}
-        >
-          <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin-slow" />
-          <span className="text-sm">Loading your chat…</span>
-        </div>
-      </div>
-    );
+    return <PageLoader label="Loading your chat…" />;
   }
 
   return (
@@ -223,6 +213,7 @@ export default function ChatPage() {
                   partnerType={partner?.id}
                 />
               ))}
+              {sending && <TypingBubble partnerType={partner?.id} />}
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -265,4 +256,3 @@ export default function ChatPage() {
     </div>
   );
 }
-

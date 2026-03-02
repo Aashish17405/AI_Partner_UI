@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { ButtonDots } from "@/components/Loader";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -75,22 +76,30 @@ export function ChatInput({
         type="submit"
         disabled={!message.trim() || disabled || loading}
         aria-label="Send"
-        className="shrink-0 w-10 h-10 flex items-center justify-center font-bold text-base transition-colors duration-100 disabled:opacity-30 disabled:cursor-not-allowed"
-        style={{
-          backgroundColor: message.trim() ? "var(--lime)" : "var(--surface-2)",
-          color: message.trim() ? "#000" : "var(--text-muted)",
-          border: "2px solid",
-          borderColor: message.trim() ? "var(--lime)" : "var(--border-loud)",
-        }}
+        className="shrink-0 w-10 h-10 flex items-center justify-center font-bold text-base transition-colors duration-100 disabled:cursor-not-allowed"
+        style={
+          loading
+            ? {
+                backgroundColor: "var(--surface-2)",
+                color: "var(--text-muted)",
+                border: "2px solid",
+                borderColor: "var(--border-loud)",
+                opacity: 1,
+              }
+            : {
+                backgroundColor: message.trim()
+                  ? "var(--lime)"
+                  : "var(--surface-2)",
+                color: message.trim() ? "#000" : "var(--text-muted)",
+                border: "2px solid",
+                borderColor: message.trim()
+                  ? "var(--lime)"
+                  : "var(--border-loud)",
+                opacity: message.trim() ? 1 : 0.3,
+              }
+        }
       >
-        {loading ? (
-          <span
-            className="w-4 h-4 border-2 border-t-transparent animate-spin-slow"
-            style={{ borderColor: "inherit" }}
-          />
-        ) : (
-          "↑"
-        )}
+        {loading ? <ButtonDots /> : "↑"}
       </button>
     </form>
   );

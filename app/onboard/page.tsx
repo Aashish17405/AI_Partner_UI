@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiClient, Partner } from "@/lib/api";
+import { ButtonDots } from "@/components/Loader";
 import { saveSessionToLocalStorage } from "@/lib/utils";
 
 export default function OnboardPage() {
@@ -487,7 +488,7 @@ export default function OnboardPage() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <span className="w-4 h-4 border-2 border-black border-t-transparent animate-spin-slow" />
+                      <ButtonDots />
                       Starting…
                     </span>
                   ) : (

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiClient, Partner } from "@/lib/api";
+import { InlineLoader } from "@/components/Loader";
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -87,13 +88,7 @@ export default function PartnersPage() {
       {/* ── PARTNER GRID ────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         {loading ? (
-          <div
-            className="flex items-center gap-3 py-20"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin-slow" />
-            <span className="text-sm">Loading companions…</span>
-          </div>
+          <InlineLoader label="Loading companions…" />
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {partners.map((partner, i) => {
