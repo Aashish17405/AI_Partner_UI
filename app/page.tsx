@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { apiClient, Partner } from "@/lib/api";
+import { InlineLoader } from "@/components/Loader";
 
 export default function HomePage() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -47,8 +48,14 @@ export default function HomePage() {
             AIPTNR
           </span>
           <div className="flex items-center gap-1">
-            <button className="btn-ghost text-sm hidden sm:flex">About</button>
-            <button className="btn-ghost text-sm hidden sm:flex">FAQ</button>
+            <Link href="/about">
+              <button className="btn-ghost text-sm hidden sm:flex">
+                About
+              </button>
+            </Link>
+            <Link href="/faq">
+              <button className="btn-ghost text-sm hidden sm:flex">FAQ</button>
+            </Link>
             <Link href="/partners">
               <button className="btn-primary text-xs py-2 px-4 ml-2">
                 Get Started
@@ -91,9 +98,11 @@ export default function HomePage() {
                 Start chatting →
               </button>
             </Link>
-            <button className="btn-outline w-full sm:w-auto text-sm py-3 px-8">
-              Learn more
-            </button>
+            <Link href="/about">
+              <button className="btn-outline w-full sm:w-auto text-sm py-3 px-8">
+                Learn more
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -148,13 +157,7 @@ export default function HomePage() {
         </div>
 
         {loading ? (
-          <div
-            className="flex items-center gap-3 py-16"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin-slow" />
-            <span className="text-sm">Loading companions…</span>
-          </div>
+          <InlineLoader label="Loading companions…" />
         ) : (
           <div
             className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px"
@@ -213,7 +216,7 @@ export default function HomePage() {
       <hr style={{ borderColor: "var(--border)" }} />
 
       {/* ── FEATURES ─────────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+      <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12">
           Why AIPTNR
           <br />
@@ -299,14 +302,22 @@ export default function HomePage() {
             className="grid grid-cols-2 sm:flex sm:gap-10 gap-4 text-sm"
             style={{ color: "var(--text-muted)" }}
           >
-            {["Features", "Pricing", "About", "Privacy", "Terms"].map((l) => (
-              <a
-                key={l}
-                href="#"
+            {(
+              [
+                { label: "Features", href: "/#features" },
+                { label: "Pricing", href: "/pricing" },
+                { label: "About", href: "/about" },
+                { label: "Privacy", href: "/privacy" },
+                { label: "Terms", href: "/terms" },
+              ] as { label: string; href: string }[]
+            ).map((l) => (
+              <Link
+                key={l.label}
+                href={l.href}
                 className="hover:text-white transition-colors"
               >
-                {l}
-              </a>
+                {l.label}
+              </Link>
             ))}
           </div>
         </div>
@@ -314,7 +325,7 @@ export default function HomePage() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs border-t pt-6"
           style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}
         >
-          <p>© 2024 AIPTNR. All rights reserved.</p>
+          <p>© 2026 AIPTNR. All rights reserved.</p>
           <p>Built for the generation that keeps it real.</p>
         </div>
       </footer>
