@@ -1,7 +1,24 @@
 import { getAccessToken } from "@/lib/auth";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://aipartnerbackend.vercel.app";
+const DEPLOYED_API_BASE_URL = "https://aipartnerbackend.vercel.app";
+
+function resolveApiBaseUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_API_BASE_URL || "").trim();
+  const cleaned = raw.replace(/\/+$/, "");
+  const isLocalTarget =
+    cleaned.includes("localhost") || cleaned.includes("127.0.0.1");
+
+  const runningOnDeployedHost =
+    typeof window !== "undefined"
+      ? !["localhost", "127.0.0.1"].includes(window.location.hostname)
+      : Boolean(process.env.VERCEL || process.env.NODE_ENV === "production");
+
+  if (!cleaned) return DEPLOYED_API_BASE_URL;
+  if (isLocalTarget && runningOnDeployedHost) return DEPLOYED_API_BASE_URL;
+  return cleaned;
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 export interface Partner {
   id: string;
