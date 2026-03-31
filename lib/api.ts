@@ -1,7 +1,7 @@
 import { getAccessToken } from "@/lib/auth";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://aipartnerbackend.vercel.app";
 
 export interface Partner {
   id: string;
