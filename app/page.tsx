@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -25,9 +25,9 @@ export default function HomePage() {
   };
 
   const partnerEmoji = (type?: string) => {
-    if (type === "girlfriend") return "👩‍🦰";
-    if (type === "boyfriend") return "👨‍🦱";
-    return "🤝";
+    if (type === "girlfriend") return "ðŸ‘©â€ðŸ¦°";
+    if (type === "boyfriend") return "ðŸ‘¨â€ðŸ¦±";
+    return "ðŸ¤";
   };
 
   return (
@@ -35,7 +35,7 @@ export default function HomePage() {
       className="min-h-screen dot-grid"
       style={{ backgroundColor: "var(--bg)" }}
     >
-      {/* ── NAV ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ NAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <nav
         className="sticky top-0 z-50 border-b"
         style={{ backgroundColor: "var(--bg)", borderColor: "var(--border)" }}
@@ -56,7 +56,12 @@ export default function HomePage() {
             <Link href="/faq">
               <button className="btn-ghost text-sm hidden sm:flex">FAQ</button>
             </Link>
-            <Link href="/partners">
+            <Link href="/chats">
+              <button className="btn-ghost text-sm hidden sm:flex">
+                Previous Chats
+              </button>
+            </Link>
+            <Link href="/chats?next=%2Fpartners">
               <button className="btn-primary text-xs py-2 px-4 ml-2">
                 Get Started
               </button>
@@ -65,14 +70,14 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ── HERO ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
         <div className="animate-fade-in">
           {/* kicker label */}
           <div className="mb-6 inline-flex items-center gap-3">
             <span className="tag">New</span>
             <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-              v2 — now with 3 companion types
+              v2 â€” now with 3 companion types
             </span>
           </div>
 
@@ -88,14 +93,19 @@ export default function HomePage() {
             className="text-base sm:text-lg max-w-xl mb-10 leading-relaxed"
             style={{ color: "var(--text-muted)" }}
           >
-            Meet your ideal AI companion — girlfriend, boyfriend, or best
+            Meet your ideal AI companion â€” girlfriend, boyfriend, or best
             friend. Real conversations, zero judgment, available 24/7.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/partners">
+            <Link href="/chats?next=%2Fpartners">
               <button className="btn-primary w-full sm:w-auto text-sm py-3 px-8">
-                Start chatting →
+                Start chatting â†’
+              </button>
+            </Link>
+            <Link href="/chats">
+              <button className="btn-outline w-full sm:w-auto text-sm py-3 px-8">
+                Continue chats
               </button>
             </Link>
             <Link href="/about">
@@ -114,7 +124,7 @@ export default function HomePage() {
           {[
             { num: "24/7", label: "Always on" },
             { num: "3", label: "Companion types" },
-            { num: "∞", label: "Conversations" },
+            { num: "âˆž", label: "Conversations" },
           ].map((s, i) => (
             <div
               key={i}
@@ -138,10 +148,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── DIVIDER ───────────────────────────────────────────────── */}
+      {/* â”€â”€ DIVIDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <hr style={{ borderColor: "var(--border)" }} />
 
-      {/* ── PARTNERS ─────────────────────────────────────────────── */}
+      {/* â”€â”€ PARTNERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
@@ -149,15 +159,15 @@ export default function HomePage() {
             <br />
             <span style={{ color: "var(--lime)" }}>companion</span>
           </h2>
-          <Link href="/partners">
+          <Link href="/chats?next=%2Fpartners">
             <button className="btn-ghost text-sm self-start sm:self-auto">
-              View all →
+              View all â†’
             </button>
           </Link>
         </div>
 
         {loading ? (
-          <InlineLoader label="Loading companions…" />
+          <InlineLoader label="Loading companionsâ€¦" />
         ) : (
           <div
             className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px"
@@ -215,7 +225,7 @@ export default function HomePage() {
 
       <hr style={{ borderColor: "var(--border)" }} />
 
-      {/* ── FEATURES ─────────────────────────────────────────────── */}
+      {/* â”€â”€ FEATURES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12">
           Why AIPTNR
@@ -230,21 +240,21 @@ export default function HomePage() {
           {[
             {
               num: "01",
-              icon: "💬",
+              icon: "ðŸ’¬",
               title: "Real conversations",
-              desc: "Deeply personal chats tailored to your personality and interests — not generic responses.",
+              desc: "Deeply personal chats tailored to your personality and interests â€” not generic responses.",
             },
             {
               num: "02",
-              icon: "⚡",
+              icon: "âš¡",
               title: "Always available",
               desc: "No waiting, no offline. Your companion is there when you need to talk, vent, or just vibe.",
             },
             {
               num: "03",
-              icon: "🎭",
+              icon: "ðŸŽ­",
               title: "Custom personalities",
-              desc: "Funny, serious, caring — pick a personality that matches your energy.",
+              desc: "Funny, serious, caring â€” pick a personality that matches your energy.",
             },
           ].map((f) => (
             <div
@@ -273,23 +283,23 @@ export default function HomePage() {
 
       <hr style={{ borderColor: "var(--border)" }} />
 
-      {/* ── CTA STRIP ────────────────────────────────────────────── */}
+      {/* â”€â”€ CTA STRIP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight max-w-md">
           Ready to find your
           <br />
           <span style={{ color: "var(--lime)" }}>person?</span>
         </h2>
-        <Link href="/partners">
+        <Link href="/chats?next=%2Fpartners">
           <button className="btn-primary py-4 px-10 text-base">
-            Start for free →
+            Start for free â†’
           </button>
         </Link>
       </section>
 
       <hr style={{ borderColor: "var(--border)" }} />
 
-      {/* ── FOOTER ───────────────────────────────────────────────── */}
+      {/* â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8 mb-10">
           <span
@@ -325,7 +335,7 @@ export default function HomePage() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs border-t pt-6"
           style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}
         >
-          <p>© 2026 AIPTNR. All rights reserved.</p>
+          <p>Â© 2026 AIPTNR. All rights reserved.</p>
           <p>Built for the generation that keeps it real.</p>
         </div>
       </footer>

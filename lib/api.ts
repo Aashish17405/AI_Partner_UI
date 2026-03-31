@@ -1,3 +1,5 @@
+import { getAccessToken } from "@/lib/auth";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -18,6 +20,8 @@ export interface Session {
   user_nickname?: string;
   language: string;
   created_at: string;
+  last_active?: string;
+  message_count?: number;
 }
 
 export interface Message {
@@ -68,7 +72,11 @@ class APIClient {
     const headers = {
       "Content-Type": "application/json",
       ...options?.headers,
-    };
+    } as Record<string, string>;
+    const token = getAccessToken();
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     try {
       const response = await fetch(url, {
@@ -144,6 +152,8 @@ class APIClient {
       user_nickname: raw.nickname,
       language: raw.language,
       created_at: raw.created_at ?? new Date().toISOString(),
+      last_active: raw.last_active,
+      message_count: raw.message_count,
     };
   }
 
@@ -157,7 +167,24 @@ class APIClient {
       user_nickname: raw.nickname,
       language: raw.language,
       created_at: raw.created_at ?? new Date().toISOString(),
+      last_active: raw.last_active,
+      message_count: raw.message_count,
     };
+  }
+
+  async listSessions(): Promise<Session[]> {
+    const rows = await this.request<BackendSession[]>("/sessions");
+    return rows.map((raw) => ({
+      id: raw.session_id,
+      partner_id: raw.partner_id,
+      partner_name: raw.partner_name,
+      user_name: raw.user_name,
+      user_nickname: raw.nickname,
+      language: raw.language,
+      created_at: raw.created_at ?? new Date().toISOString(),
+      last_active: raw.last_active,
+      message_count: raw.message_count,
+    }));
   }
 
   // Chat endpoints

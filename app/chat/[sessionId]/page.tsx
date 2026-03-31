@@ -7,7 +7,12 @@ import { apiClient, Message, Partner } from "@/lib/api";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { PageLoader, TypingBubble } from "@/components/Loader";
-import { clearSessionFromLocalStorage } from "@/lib/utils";
+import {
+  clearSessionFromLocalStorage,
+  removeSessionFromHistory,
+  saveSessionToLocalStorage,
+} from "@/lib/utils";
+import { clearSession, getStoredSession } from "@/lib/auth";
 
 export default function ChatPage() {
   const router = useRouter();
@@ -22,10 +27,16 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const auth = getStoredSession();
+    if (!auth?.access_token) {
+      router.replace(`/chats?next=${encodeURIComponent(`/chat/${sessionId}`)}`);
+      return;
+    }
     if (!sessionId || sessionId === "undefined") {
       router.push("/partners");
       return;
     }
+    saveSessionToLocalStorage(sessionId);
     loadChatData();
   }, [sessionId, router]);
 
@@ -57,6 +68,12 @@ export default function ChatPage() {
       setMessages(history);
     } catch (err) {
       console.error("Failed to load chat:", err);
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("401")) {
+        clearSession();
+        router.replace("/chats");
+        return;
+      }
       setError(
         getErrorMessage(err, "Failed to load chat history. Redirecting..."),
       );
@@ -99,8 +116,9 @@ export default function ChatPage() {
     if (!confirm("End this chat session?")) return;
     try {
       await apiClient.deleteSession(sessionId);
+      removeSessionFromHistory(sessionId);
       clearSessionFromLocalStorage();
-      router.push("/partners");
+      router.push("/chats");
     } catch (err) {
       console.error("Failed to end chat:", err);
       setError("Failed to end chat. Try again.");
@@ -167,6 +185,9 @@ export default function ChatPage() {
             >
               {messages.length} msgs
             </span>
+            <Link href="/chats">
+              <button className="btn-ghost text-xs">History</button>
+            </Link>
             <button onClick={handleEndChat} className="btn-ghost text-xs">
               End
             </button>

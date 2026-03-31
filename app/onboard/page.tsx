@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiClient, Partner } from "@/lib/api";
 import { ButtonDots } from "@/components/Loader";
 import { saveSessionToLocalStorage } from "@/lib/utils";
+import { getStoredSession } from "@/lib/auth";
 
 export default function OnboardPage() {
   const router = useRouter();
@@ -28,8 +29,18 @@ export default function OnboardPage() {
   } | null>(null);
 
   useEffect(() => {
+    const session = getStoredSession();
+    if (!session?.access_token) {
+      const next = `/onboard${window.location.search || ""}`;
+      router.replace(`/chats?next=${encodeURIComponent(next)}`);
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const pid = params.get("partner");
+    if (!pid) {
+      router.replace("/partners");
+      return;
+    }
     if (pid) {
       setPartnerId(pid);
       fetchPartnerDetails(pid);
@@ -43,7 +54,7 @@ export default function OnboardPage() {
             longitude: pos.coords.longitude,
           }),
         () => {
-          /* permission denied or unavailable — carry on without coords */
+          /* permission denied or unavailable â€” carry on without coords */
         },
         { timeout: 8000, maximumAge: 600_000 },
       );
@@ -136,7 +147,6 @@ export default function OnboardPage() {
       className="min-h-screen dot-grid"
       style={{ backgroundColor: "var(--bg)" }}
     >
-      {/* ── NAV ─────────────────────────────────────────────── */}
       <nav
         className="sticky top-0 z-50 border-b"
         style={{ backgroundColor: "var(--bg)", borderColor: "var(--border)" }}
@@ -150,14 +160,18 @@ export default function OnboardPage() {
               AIPTNR
             </span>
           </Link>
-          <Link href="/partners">
-            <button className="btn-ghost text-sm">← Change companion</button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/chats">
+              <button className="btn-ghost text-sm">Previous chats</button>
+            </Link>
+            <Link href="/partners">
+              <button className="btn-ghost text-sm">Change companion</button>
+            </Link>
+          </div>
         </div>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
-        {/* ── STEP INDICATOR ────────────────────────────────── */}
         <div className="flex items-center gap-0 mb-12">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center">
@@ -197,7 +211,6 @@ export default function OnboardPage() {
           ))}
         </div>
 
-        {/* ── HEADER ────────────────────────────────────────── */}
         <div className="mb-10">
           {partner && (
             <div className="flex items-center gap-3 mb-4">
@@ -248,7 +261,6 @@ export default function OnboardPage() {
           </h1>
         </div>
 
-        {/* ── FORM ──────────────────────────────────────────── */}
         <form onSubmit={handleSubmit}>
           {/* Step 1: Basic Info */}
           {step === 1 && (

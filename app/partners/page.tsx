@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiClient, Partner } from "@/lib/api";
 import { InlineLoader } from "@/components/Loader";
+import { getStoredSession } from "@/lib/auth";
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -13,6 +14,12 @@ export default function PartnersPage() {
   const router = useRouter();
 
   useEffect(() => {
+    const session = getStoredSession();
+    if (!session?.access_token) {
+      const next = `/partners${window.location.search || ""}`;
+      router.replace(`/chats?next=${encodeURIComponent(next)}`);
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const selected = params.get("selected");
     if (selected) setSelectedId(selected);
@@ -46,7 +53,7 @@ export default function PartnersPage() {
       className="min-h-screen dot-grid"
       style={{ backgroundColor: "var(--bg)" }}
     >
-      {/* ── NAV ─────────────────────────────────────────────── */}
+      {/* â”€â”€ NAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <nav
         className="sticky top-0 z-50 border-b"
         style={{ backgroundColor: "var(--bg)", borderColor: "var(--border)" }}
@@ -60,13 +67,18 @@ export default function PartnersPage() {
               AIPTNR
             </span>
           </Link>
-          <Link href="/">
-            <button className="btn-ghost text-sm">← Back</button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/chats">
+              <button className="btn-ghost text-sm">Previous chats</button>
+            </Link>
+            <Link href="/">
+              <button className="btn-ghost text-sm">Back</button>
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* ── HEADER ──────────────────────────────────────────── */}
+      {/* â”€â”€ HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-10 border-b"
         style={{ borderColor: "var(--border)" }}
@@ -85,10 +97,10 @@ export default function PartnersPage() {
         </p>
       </div>
 
-      {/* ── PARTNER GRID ────────────────────────────────────── */}
+      {/* â”€â”€ PARTNER GRID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         {loading ? (
-          <InlineLoader label="Loading companions…" />
+          <InlineLoader label="Loading companionsâ€¦" />
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {partners.map((partner, i) => {
@@ -162,7 +174,7 @@ export default function PartnersPage() {
         )}
       </section>
 
-      {/* ── BOTTOM CTA ──────────────────────────────────────── */}
+      {/* â”€â”€ BOTTOM CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {selectedId && (
         <div
           className="sticky bottom-0 border-t z-40 animate-slide-in-right"
@@ -170,20 +182,20 @@ export default function PartnersPage() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              {partners.find((p) => p.id === selectedId)?.name} selected — ready
+              {partners.find((p) => p.id === selectedId)?.name} selected â€” ready
               to go?
             </p>
             <button
               onClick={() => handleSelectPartner(selectedId)}
               className="btn-primary text-sm py-3 px-8 sm:w-auto w-full"
             >
-              Continue →
+              Continue â†’
             </button>
           </div>
         </div>
       )}
 
-      {/* ── COMPANION TRAITS INFO ───────────────────────────── */}
+      {/* â”€â”€ COMPANION TRAITS INFO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         className="max-w-7xl mx-auto px-4 sm:px-6 py-16 border-t"
         style={{ borderColor: "var(--border)" }}
@@ -200,7 +212,7 @@ export default function PartnersPage() {
           {[
             {
               title: "Girlfriend",
-              emoji: "💕",
+              emoji: "ðŸ’•",
               traits: [
                 "Caring & romantic",
                 "Supportive listener",
@@ -209,7 +221,7 @@ export default function PartnersPage() {
             },
             {
               title: "Boyfriend",
-              emoji: "💪",
+              emoji: "ðŸ’ª",
               traits: [
                 "Fun & adventurous",
                 "Hyping you up",
@@ -218,7 +230,7 @@ export default function PartnersPage() {
             },
             {
               title: "Best friend",
-              emoji: "🤝",
+              emoji: "ðŸ¤",
               traits: [
                 "Brutally honest",
                 "Zero judgment zone",
@@ -240,7 +252,7 @@ export default function PartnersPage() {
                     className="flex items-center gap-2 text-sm"
                     style={{ color: "var(--text-muted)" }}
                   >
-                    <span style={{ color: "var(--lime)" }}>—</span> {t}
+                    <span style={{ color: "var(--lime)" }}>â€”</span> {t}
                   </li>
                 ))}
               </ul>
