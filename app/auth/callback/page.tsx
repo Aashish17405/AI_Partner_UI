@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { consumeSessionFromUrl } from "@/lib/auth";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const rawNextPath = searchParams.get("next") || "/chats";
+    const params = new URLSearchParams(window.location.search);
+    const rawNextPath = params.get("next") || "/chats";
     const nextPath =
       rawNextPath.startsWith("/") && !rawNextPath.startsWith("//")
         ? rawNextPath
@@ -21,7 +21,7 @@ export default function AuthCallbackPage() {
       return;
     }
     setError("Authentication callback did not contain a valid session.");
-  }, [router, searchParams]);
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
