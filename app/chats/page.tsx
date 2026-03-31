@@ -48,6 +48,24 @@ export default function ChatsPage() {
   const shouldJumpAfterAuth =
     nextPath.startsWith("/") && nextPath !== "/chats" && nextPath.length > 1;
 
+  const totalMessages = useMemo(
+    () =>
+      sessions.reduce((sum, session) => sum + (session.messageCount || 0), 0),
+    [sessions],
+  );
+
+  const recentSessions = useMemo(
+    () =>
+      [...sessions]
+        .sort((a, b) => {
+          const aTime = new Date(a.lastActive || a.createdAt).getTime();
+          const bTime = new Date(b.lastActive || b.createdAt).getTime();
+          return bTime - aTime;
+        })
+        .slice(0, 4),
+    [sessions],
+  );
+
   const loadSessions = async () => {
     setLoading(true);
     setError(null);
@@ -64,7 +82,8 @@ export default function ChatsPage() {
       }));
       setSessions(mapped);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load chats.";
+      const message =
+        err instanceof Error ? err.message : "Failed to load chats.";
       if (message.includes("401")) {
         clearSession();
         setIsAuthed(false);
@@ -139,7 +158,9 @@ export default function ChatsPage() {
       } else {
         const session = await signUpWithPassword(email.trim(), password);
         if (!session) {
-          setAuthError("Check your email to verify your account, then sign in.");
+          setAuthError(
+            "Check your email to verify your account, then sign in.",
+          );
           setAuthBusy(false);
           return;
         }
@@ -151,7 +172,9 @@ export default function ChatsPage() {
       }
       await loadSessions();
     } catch (err) {
-      setAuthError(err instanceof Error ? err.message : "Authentication failed.");
+      setAuthError(
+        err instanceof Error ? err.message : "Authentication failed.",
+      );
     } finally {
       setAuthBusy(false);
     }
@@ -200,188 +223,400 @@ export default function ChatsPage() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-        <div className="mb-10">
-          <span className="tag mb-4 inline-block">Continue</span>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tighter leading-none mb-4">
-            Previous
-            <br />
-            <span style={{ color: "var(--lime)" }}>chats</span>
-          </h1>
-          <p
-            className="text-sm sm:text-base"
-            style={{ color: "var(--text-muted)" }}
-          >
-            {shouldJumpAfterAuth
-              ? "Sign in to continue your setup."
-              : "Sign in to access your saved conversations across devices."}
-          </p>
-        </div>
-
-        {!isAuthed ? (
-          <div className="card-loud max-w-xl">
-            <h2 className="text-xl font-extrabold mb-2">Login required</h2>
-            <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
-              Use Google, or email and password.
-            </p>
-
-            <div className=" mb-4">
-              <button
-                onClick={() => startOAuthSignIn("google", nextPath || "/chats")}
-                className="btn-outline text-sm py-3 w-full flex items-center justify-center gap-2"
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_420px] gap-6 lg:gap-6 items-start">
+          <section>
+            <div className="mb-10">
+              <span className="tag mb-4 inline-block">Continue</span>
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tighter leading-none mb-4">
+                Previous
+                <br />
+                <span style={{ color: "var(--lime)" }}>chats</span>
+              </h1>
+              <p
+                className="text-sm sm:text-base"
+                style={{ color: "var(--text-muted)" }}
               >
                 {shouldJumpAfterAuth
-                  ? "Continue setup with Google"
-                  : "Continue with Google"}
-              </button>
+                  ? "Sign in to continue your setup."
+                  : "Sign in to access your saved conversations across devices."}
+              </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs mb-4" style={{ color: "var(--text-muted)" }}>
-              <span className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
-              <span>or</span>
-              <span className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
-            </div>
-
-            <form onSubmit={handleEmailAuth} className="space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
-                placeholder="Email"
-                required
-              />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input-field"
-                placeholder="Password"
-                minLength={6}
-                required
-              />
-              {authError && (
-                <p className="text-xs font-medium" style={{ color: "var(--pink)" }}>
-                  {authError}
+            {!isAuthed ? (
+              <div className="card-loud max-w-xl">
+                <h2 className="text-xl font-extrabold mb-2">Login required</h2>
+                <p
+                  className="text-sm mb-5"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Use Google, or email and password.
                 </p>
-              )}
-              <button disabled={authBusy} className="btn-primary text-sm py-3 w-full" type="submit">
-                {authBusy
-                  ? "Please wait..."
-                  : authMode === "signin"
-                    ? "Sign in"
-                    : "Create account"}
-              </button>
-            </form>
 
-            <button
-              type="button"
-              className="btn-ghost text-sm mt-2"
-              onClick={() => {
-                setAuthMode((prev) => (prev === "signin" ? "signup" : "signin"));
-                setAuthError(null);
-              }}
-            >
-              {authMode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
-            </button>
-          </div>
-        ) : (
-          <>
-            {error && (
-              <div
-                className="mb-6 px-4 py-3 text-sm font-medium border"
-                style={{
-                  borderColor: "var(--pink)",
-                  color: "var(--pink)",
-                  backgroundColor: "rgba(255,45,107,0.05)",
-                }}
-              >
-                {error}
-              </div>
-            )}
+                <div className=" mb-4">
+                  <button
+                    onClick={() =>
+                      startOAuthSignIn("google", nextPath || "/chats")
+                    }
+                    className="btn-outline text-sm py-3 w-full flex items-center justify-center gap-2"
+                  >
+                    {shouldJumpAfterAuth
+                      ? "Continue setup with Google"
+                      : "Continue with Google"}
+                  </button>
+                </div>
 
-            {loading ? (
-              <div className="card">
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                  Loading your saved chats...
-                </p>
-              </div>
-            ) : sessions.length === 0 ? (
-              <div className="card-loud">
-                <h2 className="text-xl font-extrabold mb-2">
-                  No previous chats found
-                </h2>
-                <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
-                  Start a new conversation and it will appear here.
-                </p>
-                <Link href="/partners">
-                  <button className="btn-primary text-sm">Start New Chat</button>
-                </Link>
+                <div
+                  className="flex items-center gap-2 text-xs mb-4"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  <span
+                    className="h-px flex-1"
+                    style={{ backgroundColor: "var(--border)" }}
+                  />
+                  <span>or</span>
+                  <span
+                    className="h-px flex-1"
+                    style={{ backgroundColor: "var(--border)" }}
+                  />
+                </div>
+
+                <form onSubmit={handleEmailAuth} className="space-y-3">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input-field"
+                    placeholder="Email"
+                    required
+                  />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-field"
+                    placeholder="Password"
+                    minLength={6}
+                    required
+                  />
+                  {authError && (
+                    <p
+                      className="text-xs font-medium"
+                      style={{ color: "var(--pink)" }}
+                    >
+                      {authError}
+                    </p>
+                  )}
+                  <button
+                    disabled={authBusy}
+                    className="btn-primary text-sm py-3 w-full"
+                    type="submit"
+                  >
+                    {authBusy
+                      ? "Please wait..."
+                      : authMode === "signin"
+                        ? "Sign in"
+                        : "Create account"}
+                  </button>
+                </form>
+
+                <button
+                  type="button"
+                  className="btn-ghost text-sm mt-2"
+                  onClick={() => {
+                    setAuthMode((prev) =>
+                      prev === "signin" ? "signup" : "signin",
+                    );
+                    setAuthError(null);
+                  }}
+                >
+                  {authMode === "signin"
+                    ? "Need an account? Sign up"
+                    : "Already have an account? Sign in"}
+                </button>
               </div>
             ) : (
-              <div className="grid gap-4">
-                {sessions.map((session) => (
+              <>
+                {error && (
                   <div
-                    key={session.id}
-                    className="card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                    className="mb-6 px-4 py-3 text-sm font-medium border"
+                    style={{
+                      borderColor: "var(--pink)",
+                      color: "var(--pink)",
+                      backgroundColor: "rgba(255,45,107,0.05)",
+                    }}
                   >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl" aria-hidden="true">
-                          {partnerEmoji(session.partnerId)}
-                        </span>
+                    {error}
+                  </div>
+                )}
+
+                {loading ? (
+                  <div className="card">
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Loading your saved chats...
+                    </p>
+                  </div>
+                ) : sessions.length === 0 ? (
+                  <div className="card-loud">
+                    <h2 className="text-xl font-extrabold mb-2">
+                      No previous chats found
+                    </h2>
+                    <p
+                      className="text-sm mb-5"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Start a new conversation and it will appear here.
+                    </p>
+                    <Link href="/partners">
+                      <button className="btn-primary text-sm">
+                        Start New Chat
+                      </button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {sessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className="card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                      >
                         <div className="min-w-0">
-                          <p className="font-bold truncate">
-                            {session.partnerName}
-                          </p>
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="text-2xl" aria-hidden="true">
+                              {partnerEmoji(session.partnerId)}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="font-bold truncate">
+                                {session.partnerName}
+                              </p>
+                              <p
+                                className="text-xs uppercase tracking-wider"
+                                style={{ color: "var(--text-muted)" }}
+                              >
+                                {session.partnerId.replace("_", " ")}
+                              </p>
+                            </div>
+                            {session.id === currentSessionId && (
+                              <span className="tag-outline">Current</span>
+                            )}
+                          </div>
+
                           <p
-                            className="text-xs uppercase tracking-wider"
+                            className="text-sm"
                             style={{ color: "var(--text-muted)" }}
                           >
-                            {session.partnerId.replace("_", " ")}
+                            With {session.userName}
+                            {session.messageCount !== undefined
+                              ? ` • ${session.messageCount} messages`
+                              : ""}
+                          </p>
+                          <p
+                            className="text-xs mt-1"
+                            style={{ color: "var(--text-muted)" }}
+                          >
+                            Last active{" "}
+                            {formatDate(
+                              session.lastActive || session.createdAt,
+                            )}
                           </p>
                         </div>
-                        {session.id === currentSessionId && (
-                          <span className="tag-outline">Current</span>
-                        )}
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() => handleResume(session.id)}
+                            className="btn-primary text-xs py-2 px-4"
+                            disabled={busyId === session.id}
+                          >
+                            Continue
+                          </button>
+                          <button
+                            onClick={() => handleDelete(session.id)}
+                            className="btn-outline text-xs py-2 px-4"
+                            disabled={busyId === session.id}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </section>
 
-                      <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                        With {session.userName}
-                        {session.messageCount !== undefined
-                          ? ` • ${session.messageCount} messages`
-                          : ""}
-                      </p>
-                      <p
-                        className="text-xs mt-1"
-                        style={{ color: "var(--text-muted)" }}
-                      >
-                        Last active {formatDate(session.lastActive || session.createdAt)}
-                      </p>
-                    </div>
+          <aside className="lg:sticky lg:top-20 space-y-4">
+            <div className="card-loud">
+              <p
+                className="text-xs uppercase tracking-[0.2em] mb-3"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Workspace
+              </p>
+              <div
+                className="grid grid-cols-2 gap-px"
+                style={{ backgroundColor: "var(--border)" }}
+              >
+                <div
+                  className="p-3"
+                  style={{ backgroundColor: "var(--surface)" }}
+                >
+                  <p
+                    className="text-lg font-extrabold"
+                    style={{ color: "var(--lime)" }}
+                  >
+                    {isAuthed && !loading ? sessions.length : "--"}
+                  </p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Sessions
+                  </p>
+                </div>
+                <div
+                  className="p-3"
+                  style={{ backgroundColor: "var(--surface)" }}
+                >
+                  <p
+                    className="text-lg font-extrabold"
+                    style={{ color: "var(--lime)" }}
+                  >
+                    {isAuthed && !loading ? totalMessages : "--"}
+                  </p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Messages
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => handleResume(session.id)}
-                        className="btn-primary text-xs py-2 px-4"
-                        disabled={busyId === session.id}
-                      >
-                        Continue
-                      </button>
-                      <button
-                        onClick={() => handleDelete(session.id)}
-                        className="btn-outline text-xs py-2 px-4"
-                        disabled={busyId === session.id}
-                      >
-                        Delete
-                      </button>
-                    </div>
+            <div className="card">
+              <p
+                className="text-xs uppercase tracking-[0.2em] mb-3"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Chat Flow
+              </p>
+              <div className="space-y-2">
+                {[
+                  {
+                    id: "01",
+                    title: "Choose a companion",
+                    desc: "Pick a vibe that matches your mood and style.",
+                  },
+                  {
+                    id: "02",
+                    title: "Start talking",
+                    desc: "The conversation adapts to you in real time.",
+                  },
+                  {
+                    id: "03",
+                    title: "Pick up anytime",
+                    desc: "Your sessions stay available across devices.",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.id}
+                    className="px-3 py-2 border"
+                    style={{
+                      borderColor: "var(--border)",
+                      backgroundColor: "var(--surface)",
+                    }}
+                  >
+                    <p
+                      className="text-xs font-mono mb-1"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {item.id}
+                    </p>
+                    <p className="text-sm font-bold">{item.title}</p>
+                    <p
+                      className="text-xs mt-1"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {item.desc}
+                    </p>
                   </div>
                 ))}
               </div>
+            </div>
+
+            {isAuthed && !loading && recentSessions.length > 0 && (
+              <div className="card">
+                <p
+                  className="text-xs uppercase tracking-[0.2em] mb-3"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Session Preview
+                </p>
+                <div className="space-y-2">
+                  {recentSessions.map((session) => (
+                    <div
+                      key={`recent-${session.id}`}
+                      className="w-full text-left px-3 py-2 border"
+                      style={{
+                        borderColor: "var(--border)",
+                        backgroundColor:
+                          session.id === currentSessionId
+                            ? "var(--surface-2)"
+                            : "var(--surface)",
+                      }}
+                    >
+                      <p className="text-sm font-bold truncate">
+                        {partnerEmoji(session.partnerId)} {session.partnerName}
+                      </p>
+                      <p
+                        className="text-xs"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {formatDate(session.lastActive || session.createdAt)}
+                        {session.messageCount !== undefined
+                          ? ` • ${session.messageCount} msgs`
+                          : ""}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
-          </>
-        )}
+
+            <div className="card">
+              <p
+                className="text-xs uppercase tracking-[0.2em] mb-3"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Companion Modes
+              </p>
+              <div
+                className="grid grid-cols-3 gap-px"
+                style={{ backgroundColor: "var(--border)" }}
+              >
+                {[
+                  { emoji: "👩", label: "Girlfriend" },
+                  { emoji: "👨", label: "Boyfriend" },
+                  { emoji: "🤝", label: "Best friend" },
+                ].map((mode) => (
+                  <div
+                    key={mode.label}
+                    className="p-3 text-center"
+                    style={{ backgroundColor: "var(--surface)" }}
+                  >
+                    <p className="text-2xl mb-1" aria-hidden="true">
+                      {mode.emoji}
+                    </p>
+                    <p
+                      className="text-[11px] uppercase tracking-wide"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {mode.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
       </main>
     </div>
   );

@@ -54,7 +54,7 @@ export default function OnboardPage() {
             longitude: pos.coords.longitude,
           }),
         () => {
-          /* permission denied or unavailable â€” carry on without coords */
+          /* permission denied or unavailable — carry on without coords */
         },
         { timeout: 8000, maximumAge: 600_000 },
       );
