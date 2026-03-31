@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api";
 import {
   clearSession,
@@ -32,7 +32,6 @@ type SessionCard = {
 
 export default function ChatsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [sessions, setSessions] = useState<SessionCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,13 +42,9 @@ export default function ChatsPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthed, setIsAuthed] = useState(false);
+  const [nextPath, setNextPath] = useState("");
 
   const currentSessionId = useMemo(() => getSessionFromLocalStorage(), []);
-  const rawNextPath = searchParams.get("next") || "";
-  const nextPath =
-    rawNextPath.startsWith("/") && !rawNextPath.startsWith("//")
-      ? rawNextPath
-      : "";
   const shouldJumpAfterAuth =
     nextPath.startsWith("/") && nextPath !== "/chats" && nextPath.length > 1;
 
@@ -83,10 +78,22 @@ export default function ChatsPage() {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const rawNextPath = params.get("next") || "";
+    const safeNextPath =
+      rawNextPath.startsWith("/") && !rawNextPath.startsWith("//")
+        ? rawNextPath
+        : "";
+    setNextPath(safeNextPath);
+
     const session = getStoredSession();
     setIsAuthed(Boolean(session?.access_token));
-    if (session?.access_token && shouldJumpAfterAuth) {
-      router.replace(nextPath);
+    if (
+      session?.access_token &&
+      safeNextPath.startsWith("/") &&
+      safeNextPath !== "/chats"
+    ) {
+      router.replace(safeNextPath);
       return;
     }
     if (session?.access_token) {
@@ -95,7 +102,7 @@ export default function ChatsPage() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextPath, shouldJumpAfterAuth, router]);
+  }, [router]);
 
   const partnerEmoji = (type?: string) => {
     if (type === "girlfriend") return "👩";
