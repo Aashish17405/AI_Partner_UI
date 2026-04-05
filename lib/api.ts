@@ -206,8 +206,12 @@ class APIClient {
 
   // Chat endpoints
   async sendMessage(sessionId: string, message: string): Promise<ChatResponse> {
+    const localTimeStr = new Date().toLocaleString() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
     return this.request<ChatResponse>(`/sessions/${sessionId}/chat`, {
       method: "POST",
+      headers: {
+        "X-Local-Time": localTimeStr,
+      },
       body: JSON.stringify({ message }),
     });
   }

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -84,12 +84,13 @@ export default function ChatsPage() {
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to load chats.";
-      if (message.includes("401")) {
+      if (message.includes("API Error: 401")) {
+        console.warn("Unauthorized request detected. Clearing local session.");
         clearSession();
         setIsAuthed(false);
         setError(null);
       } else {
-        setError("Some chats could not be loaded. Please try again.");
+        setError("Your chats could not be loaded right now. Please try again later.");
       }
     } finally {
       setLoading(false);

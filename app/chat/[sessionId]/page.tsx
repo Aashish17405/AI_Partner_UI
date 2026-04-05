@@ -69,7 +69,9 @@ export default function ChatPage() {
     } catch (err) {
       console.error("Failed to load chat:", err);
       const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("401")) {
+      // Only clear the session if we are certain it's a 401 Unauthorized
+      if (msg.includes("API Error: 401")) {
+        console.warn("Session expired or unauthorized. Logging out.");
         clearSession();
         router.replace("/chats");
         return;

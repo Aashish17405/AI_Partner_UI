@@ -182,8 +182,8 @@ export default function PartnersPage() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              {partners.find((p) => p.id === selectedId)?.name} selected â€” ready
-              to go?
+              {partners.find((p) => p.id === selectedId)?.name} selected â€”
+              ready to go?
             </p>
             <button
               onClick={() => handleSelectPartner(selectedId)}
@@ -212,7 +212,7 @@ export default function PartnersPage() {
           {[
             {
               title: "Girlfriend",
-              emoji: "ðŸ’•",
+              emoji: "👩‍🦰",
               traits: [
                 "Caring & romantic",
                 "Supportive listener",
@@ -221,7 +221,7 @@ export default function PartnersPage() {
             },
             {
               title: "Boyfriend",
-              emoji: "ðŸ’ª",
+              emoji: "👨‍🦱",
               traits: [
                 "Fun & adventurous",
                 "Hyping you up",
@@ -230,7 +230,7 @@ export default function PartnersPage() {
             },
             {
               title: "Best friend",
-              emoji: "ðŸ¤",
+              emoji: "🤝",
               traits: [
                 "Brutally honest",
                 "Zero judgment zone",
